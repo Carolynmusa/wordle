@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wordle Game</title>
+  <style>
+    body {
+      background: linear-gradient(45deg, #4b4fe2 33%, #0ec38b);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      padding-top: 50px; 
+    }
+
+    .square {
+      width: 60px; 
+      height: 60px; 
+      margin: 5px;
+      border: 1px solid #333;
+      display: inline-block;
+      vertical-align: top;
+      font-size: 24px; 
+      text-align: center;
+      box-sizing: border-box;
+      line-height: 60px;
+      border-radius: 5px; 
+      background-color: white; 
+    }
+
+    .board {
+      width: 320px; 
+    }
+
+    .row {
+      display: flex; 
+    }
+
+    .turn-indicator {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 24px;
+      color: white; 
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #333;
+      padding: 10px 0; 
+      text-align: center;
+      color: white;
+      z-index: 999; 
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Wordle Game</h1>
+  </header>
+  <div id="root"></div>
+  <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+  <script>
+    function Square(props) {
+      return <div className="square" style={{ backgroundColor: props.color }}>{props.face}</div>;
+    }
+
+    function WordleBoard() {
+      const guesses = ['might', 'flood', 'stray'];
+      const answer = 'moody';
+      const squares = [];
+
+      function getColor(guess, index) {
+        if (guess[index] === answer[index]) {
+          return 'green'; 
+        } else if (answer.includes(guess[index])) {
+          return 'yellow'; 
+        }
+        return 'white'; 
+      }
+
+      for (let i = 0; i < 6; i++) {
+        const guess = guesses[i] || ''; 
+        for (let j = 0; j < 5; j++) {
+          squares.push(<Square key={i * 5 + j} face={guess[j] || ''} color={getColor(guess, j) || 'white'} />); 
+        }
+      }
+
+      const rows = [];
+      for (let i = 0; i < 6; i++) {
+        const row = squares.slice(i * 5, (i + 1) * 5); 
+        rows.push(<div className="row" key={i}>{row}</div>);
+      }
+
+      return <div className="board">{rows}</div>;
+    }
+
+    function OnScreenKeyboard() {
+      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+      const firstLine = alphabet.slice(0, 13);
+      const secondLine = alphabet.slice(13, 26);
+
+      const firstLineButtons = firstLine.map(letter =>
+        <button key={letter}>{letter}</button>
+      );
+
+      const secondLineButtons = secondLine.map(letter =>
+        <button key={letter}>{letter}</button>
+      );
+
+      return (
+        <div>
+          <h2>On-Screen Keyboard</h2>
+          <div>{firstLineButtons}</div>
+          <div>{secondLineButtons}</div>
+        </div>
+      );
+    }
+
+    function Results() {
+      const guesses = ['might', 'flood', 'stray'];
+      const answer = 'moody';
+      const results = [];
+
+      guesses.forEach(guess => {
+        let correctLetters = 0;
+        let correctPositions = 0;
+
+        for (let i = 0; i < guess.length; i++) {
+          if (guess[i] === answer[i]) {
+            correctPositions++;
+          }
+        }
+
+        results.push(`${guess}: ${correctPositions} position(s), ${guess.length - correctPositions} letter(s)`);
+      });
+
+      return (
+        <div>
+          <h2>Results</h2>
+          {results.map((result, index) => <p key={index}>{result}</p>)}
+        </div>
+      );
+    }
+
+    const wordleApp = (
+      <div>
+        <WordleBoard />
+        <OnScreenKeyboard />
+        <Results />
+      </div>
+    );
+
+    ReactDOM.render(wordleApp, document.getElementById('root'));
+  </script>
+</body>
+</html>
